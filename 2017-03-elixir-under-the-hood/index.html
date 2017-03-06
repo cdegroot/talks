@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <!-- TODO move this stuff to an external CSS file at some point -->
+    <style>
+      body {
+        font-family: 'Gill Sans';
+        line-height: 1.5;
+      }
+      h1, h2, h3 {
+        font-family: 'Gill Sans';
+        font-weight: normal;
+      }
+      .remark-slide-content {
+        font-size: 24pt;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Source Code Pro'; }
+      .fn {
+        font-size: 50%;
+        vertical-align: super;
+      }
+      .footnote {
+        font-size: 75%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Elixir Under the Hood
+
+---
+
+# Agenda
+
+1. Introduction
+2. What _are_ Erlang, BEAM, OTP?
+3. OTP
+4. Mix
+
+---
+
+# Introduction
+
+* Elixir is awesome-sauce on top of Erlang/BEAM/OTP
+* Sometimes, though, you need to open up the hood
+* Knowing the engine makes you a better developer
+
+---
+
+# Erlang
+
+* The language originally developed by Joe Armstrong for Ericsson AB
+* Mash-up of Prolog, Lisp, and other '80s cool things
+* Language plus libs ("BIFs").fn[1]
+* Immutable, pattern matching, functional
+
+.footnote[.fn[1] https://rvirding.blogspot.ca/2009/10/what-are-bifs.html]
+
+---
+
+# BEAM
+
+* The Erlang virtual machine
+* Implements the Built-In-Functions
+* Allows to talk to the ouside world (ports and NIFs)
+* All the heavy lifting, basically
+
+???
+
+http://www.erlang-factory.com/upload/presentations/708/HitchhikersTouroftheBEAM.pdf
+
+---
+
+# OTP
+
+* A set of conventions around Erlang+BEAM
+* How to package stuff
+* How to deploy/start stuff
+* How to upgrade stuff
+
+---
+
+# OTP
+
+You can write what you want without a single reference to OTP!
+
+Use `send` / `receive` etcetera.
+
+---
+
+# Everyday OTP
+
+* Supervisor
+* Application
+* GenServer
+* Agent
+* Task
+
+---
+
+# Not so everyday OTP
+
+* Releases
+* Release handling
+
+---
+
+# Mix
+
+It is very important to know what happens compile time
+and what happens run time!
+
+
+(Demo)
+
+
+    </textarea>
+    <script src="../shared/js/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+  <!--
+       Local Variables:
+       mode: markdown
+       End:
+     -->
+</html>
