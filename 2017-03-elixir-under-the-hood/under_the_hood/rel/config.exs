@@ -24,13 +24,19 @@ use Mix.Releases.Config,
 environment :dev do
   set dev_mode: true
   set include_erts: false
-  set cookie: :"*E|5HGYe|~f6,QW8=1|^CVmycp!TUW*u}*<VoJ9>4uzl,J)HlX0I3Q|La8?ex15t"
+  set cookie: :hack_my_node
 end
 
 environment :prod do
   set include_erts: true
   set include_src: false
-  set cookie: :":nzBYx!$%V{^hI9AQX)pdS1zyNFpreVml1>rioA@`1|N~}nynz0k&uX0F,CKcLr6"
+  set cookie: :hack_my_node
+end
+
+environment :test do
+  set include_erts: true
+  set include_src: false
+  set cookie: :hack_my_node
 end
 
 # You may define one or more releases in this file.
@@ -41,4 +47,3 @@ end
 release :under_the_hood do
   set version: current_version(:under_the_hood)
 end
-

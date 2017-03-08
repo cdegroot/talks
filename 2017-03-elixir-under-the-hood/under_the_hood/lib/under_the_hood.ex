@@ -5,10 +5,6 @@ defmodule UnderTheHood do
 
   use Application
 
-  def hello_simple do
-    :world
-  end
-
   def hello_config do
     Application.get_env(:under_the_hood, :world)
   end
@@ -18,8 +14,8 @@ defmodule UnderTheHood do
   end
 
   def start(_, _) do
+    IO.puts("Hello before put: #{Application.get_env(:under_the_hood, :world)}")
     Application.put_env(:under_the_hood, :world, "go go go!")
-    IO.puts("Hello_simple: #{hello_simple()}")
     IO.puts("Hello_config: #{hello_config()}")
     IO.puts("Hello_module: #{hello_module()}")
     {:ok, self()}
