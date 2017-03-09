@@ -36,6 +36,17 @@
       .normalimg img {
         width: 100%;
       }
+      .remark-slide-content:after {
+        content: "";
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        height: 70px;
+        width: 210px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-image: url('../shared/PagerDuty-logo-green.png')
+      }
     </style>
   </head>
   <body>
@@ -380,8 +391,7 @@ Therefore also a compile-time constant.
     Application.get_env(:under_the_hood, :world)
   end
 ```
-
-Normal run-time stuff, so
+Normal run-time stuff, so this works as expected:
 
 ```elixir
   def start(_, _) do
@@ -390,8 +400,6 @@ Normal run-time stuff, so
     IO.puts("Hello_config: #{hello_config()}")
   end
 ```
-
-Works as expected.
 
 ---
 # Under the hood
