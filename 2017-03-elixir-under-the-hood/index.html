@@ -33,6 +33,9 @@
       .footnote {
         font-size: 75%;
       }
+      .normalimg img {
+        width: 100%;
+      }
     </style>
   </head>
   <body>
@@ -42,13 +45,15 @@ class: center, middle
 
 # Elixir Under the Hood
 
+(or: OTP and you)
+
 ---
 # Agenda
 
 1. Introduction
 2. What _are_ Erlang, BEAM, OTP?
 3. OTP
-4. Mix, releases
+4. Mix and releases
 
 ---
 # Introduction
@@ -83,9 +88,10 @@ http://www.erlang-factory.com/upload/presentations/708/HitchhikersTouroftheBEAM.
 # OTP
 
 * A set of conventions around Erlang+BEAM
-* How to package stuff
-* How to deploy/start stuff
-* How to upgrade stuff
+  * Common patterns
+  * How to package stuff
+  * How to deploy/start stuff
+  * How to upgrade stuff
 
 ???
 http://learnyousomeerlang.com/what-is-otpt
@@ -100,7 +106,7 @@ Use `send` / `receive` etcetera.
 ..but you shouldn't.
 
 ---
-# Process mailboxes.fn[1]
+# Example: process mailboxes.fn[1]
 
 * Unbounded FIFOs with filtering
 
@@ -121,18 +127,154 @@ What happened with message one?
 Luckily, GenServer doesn't have a selective receive loop
 
 ---
-# Everyday OTP
+# Everyday OTP.fn[1]
 
+* GenServer
 * Supervisor
 * Application
-* GenServer
-* Agent
-* Task
 
 *OTP defines standard behavior*
 
+.footnote[.fn[1] We skip Agent and Task for now]
+
 ---
-# OTP Applications
+# GenServer
+
+* Mostly defined in `gen_server`, the Erlang module.
+* Closest thing to an "object" - behaviour + state.
+  * Behaviour: the module.
+  * Where's the state?
+
+???
+Demo - open up observer. Where's the module, anyway?
+
+---
+# GenServer state
+
+On the stack:
+
+```erlang
+loop(Parent, Name, State, Mod, Time, Debug) ->
+    Msg = receive Input -> Input
+          after Time -> timeout
+          end,
+    decode_msg(Msg, Parent, Name, State, Mod, Time, Debug, false).
+```
+with `decode_msg` -> `handle_msg` -> `loop(... new state)`
+
+???
+
+...and now you know how gen_server finds the correct code as well...
+
+https://www.erlang-solutions.com/blog/erlang-19-0-garbage-collector.html
+
+---
+# Supervisor
+
+.normalimg[![A supervisor](supervisor.png)]
+
+---
+# Supervisor
+
+.normalimg[![Supervisor state](supervisor_state.png)]
+
+---
+# Supervisor
+
+Important things to realize:
+* It's just a process
+* It takes _specifications_ of children, not children
+  * That makes the restart magic possible!
+
+---
+# Design considerations
+
+When to use....
+* Most well-known principles hold:
+  * Single responsibility is key
+  * Dependency injection is important
+
+---
+# Design considerations
+
+When to use Task
+* Async process with "closed" state
+* Supervised or not
+  * Are we interested in failure?
+
+---
+# Design considerations
+
+When to use Agent
+* Process with just state
+* Behaviour is dynamic, but please KISS
+
+---
+# Design considerations
+
+When to use GenServer
+* Most of the time
+* State and behaviour
+
+---
+# Design considerations
+
+When to use Supervisor
+* When GenServer wants subprocesses
+* Split Supervisor and GenServer
+  * More typing, but more SRP
+
+---
+# Antipatterns
+
+Globals everywhere - global process name
+```elixir
+def start_link do
+  GenServer.start_link(__MODULE__, [], name: __MODULE__)
+end
+```
+Highlander process - there can only be one.
+
+---
+# Antipatterns
+
+Globals everywhere - call global processes
+```elixir
+def my_function do
+  MyGenServerThingy.do_some_work()
+end
+...
+def do_some_work do
+  GenServer.call(__MODULE__, {:do_some_work})
+end
+```
+
+---
+# Antipatterns
+
+Use DI instead
+```elixir
+def my_function(state) do
+  MyGenServerThingy.do_some_work(state.mgst_pid)
+end
+...
+def do_some_work(pid) do
+  GenServer.call(pid, {:do_some_work})
+end
+```
+
+---
+# Antipatterns
+
+`GenServer.call` everywhere
+* It's synchronous, introduces waits
+* It has a default 5 second timeout
+* `cast` and callbacks
+  * Basically, that's what a call does anyway :P
+  * Think async!
+
+---
+# Application
 
 * Deployable item under OTP
 * Scope of reuse
@@ -141,10 +283,61 @@ Luckily, GenServer doesn't have a selective receive loop
 Comparable with pretty much nothing else.
 
 ---
-# Not so everyday OTP
+# Application
+```elixir
+def start(type, args) do
+  ... what do I do here?
+end
+```
+`type` is always `{:normal}`. If not, you know what
+you're doing.fn[1]
 
-* Releases
-* Release handling
+.footnote[.fn[1]&nbsp;http://erlang.org/doc/design_principles/distributed_applications.html]
+
+---
+# Application
+```elixir
+def start(type, args) do
+  ... what do I do here?
+end
+```
+`args` is almost always the `[]` from `mix.exs`:
+```elixir
+def application do
+  [mod: {MyApp, []}]
+end
+```
+You could pass stuff like a version here, maybe?
+
+---
+# Application
+```elixir
+def start(_type, _args) do
+  MyApp.Supervisor.start_link()
+end
+```
+That's your 99%-of-the-cases correct boilerplate
+* Return a Supervisor
+* `self()` is usually not what you want.
+* Keep two files - people expect it and files are cheap.
+
+---
+# Application
+```elixir
+def stop(_state) do
+  # Insert teard-down code here
+end
+```
+If you want graceful shutdown, don't forget the `stop`
+callback!
+
+---
+# Application or Supervisor?
+* Application makes for very simple reuse
+* A library is always an OTP application,
+* .. but doesn't always start a process tree
+* If you have a GenServer in your library, you probably want one
+* Consider it for each module in an umbrella setup.
 
 ---
 # Mix and OTP
@@ -180,7 +373,7 @@ A compile-time constant.
 Therefore also a compile-time constant.
 
 ---
-# What happene there?
+# What happened there?
 
 ```elixir
   def hello_config do
@@ -340,9 +533,10 @@ By now, you should grok this :-)
 * 12FA it with `REPLACE_OS_VARS`
 * Shameless plug: `docker_distiller`.fn[1] does it all
   * Combines multiple releases in one container
-  * Confusingly now allows MIX_ENV again ;-)
+  * Confusingly now allows MIX_ENV again.fn[2] ;-)
 
-.footnote[.fn[1] https://github.com/PagerDuty/docker_distiller]
+.footnote[.fn[1] https://github.com/PagerDuty/docker_distiller]<br/>
+.footnote[.fn[2] yeah, maybe a bug]
 
 ---
 class: center, middle
