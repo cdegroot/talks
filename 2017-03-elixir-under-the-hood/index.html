@@ -9,6 +9,7 @@
       body {
         font-family: 'colfaxwebregular';
         line-height: 1.5;
+        color:         #333;
       }
       h1 {
         margin-top: 0;
@@ -23,9 +24,14 @@
         padding: 1em;
         padding-top: 0.5em;
       }
+      .remark-slide-number {
+        font-size: 12pt;
+        bottom: 21px;
+      }
       .remark-code, .remark-inline-code {
-        font-family: 'Source Code Pro';
+        font-family: 'Consolas';
         font-size: 90%;
+        background: #f0f0f0;
       }
       code {
         border-radius: 5px;
@@ -56,6 +62,13 @@
         background-repeat: no-repeat;
         background-size: contain;
         background-image: url('../shared/PagerDuty-logo-green.png')
+      }
+      .remark-visible {
+        background: #333;
+      }
+      .remark-slide-scaler {
+        box-shadow: 0 0 30px #000;
+        -webkit-box-shadow: 0 0 30px #000;
       }
     </style>
   </head>
@@ -148,15 +161,16 @@ What happened with message one?
 Luckily, GenServer doesn't have a selective receive loop
 
 ---
-# Everyday OTP.fn[1]
+# Everyday OTP
 
-* GenServer (gen_server)
-* Supervisor (supervisor)
-* Application (application)
+* GenServer (`:gen_server`)
+* Supervisor (`:supervisor`)
+* Application (`:application`)
 
 *OTP defines standard behavior*
 
-.footnote[.fn[1] We skip Agent and Task for now]
+.fn[_Note: Elixir adds higher-level stuff like Task and Agent - don't forget about these!_]
+
 
 ---
 # GenServer
@@ -218,24 +232,10 @@ When to use....
 ---
 # Design considerations
 
-When to use Task
-* Async process with "closed" state
-* Supervised or not
-  * Are we interested in failure?
-
----
-# Design considerations
-
-When to use Agent
-* Process with just state
-* Behaviour is dynamic, but please KISS
-
----
-# Design considerations
-
 When to use GenServer
 * Most of the time
 * State and behaviour
+  * GenServer is your object stuff
 
 ---
 # Design considerations
@@ -244,6 +244,15 @@ When to use Supervisor
 * When GenServer wants subprocesses
 * Split Supervisor and GenServer
   * More typing, but more SRP
+
+---
+# Design considerations
+
+But there's more!
+* GenServer, Supervisor and Application are
+the core of OTP
+* Agent, Task, GenState, ...
+* Using Erlang's `:gen_statem` etcetera is quite simple
 
 ---
 # Antipatterns
@@ -273,12 +282,26 @@ end
 ---
 # Antipatterns
 
-Use DI instead
+Use DI instead. Ctor-injection in Elixir:
 ```elixir
-def my_function(state) do
-  MyGenServerThingy.do_some_work(state.mgst_pid)
+def start_link(dependency_pid) do
+  GenServer.start_link(__MODULE__, dependency_pid)
 end
 ...
+def init(dependency_pid) do
+  {:ok, %State{dependency_pid: dependency_pid}}
+end
+```
+
+---
+# Antipatterns
+
+Use DI instead. Using injected state:
+```elixir
+def my_function(state) do
+  MyGenServerThingy.do_some_work(state.dependency_pid)
+end
+... # in the dependency
 def do_some_work(pid) do
   GenServer.call(pid, {:do_some_work})
 end
@@ -351,14 +374,6 @@ end
 ```
 If you want graceful shutdown, don't forget the `stop`
 callback!
-
----
-# Application or Supervisor?
-* Application makes for very simple reuse
-* A library is always an OTP application,
-* .. but doesn't always start a process tree
-* If you have a GenServer in your library, you probably want one
-* Consider it for each module in an umbrella setup.
 
 ---
 # Mix and OTP
@@ -495,6 +510,7 @@ is all that's left of
 config :under_the_hood,
   world: "production, dude!"
 ```
+.footnote[_Note: `sasl` = System Architecture Support Libraries, not RFC4422_]
 ---
 # OTP Releases
 
@@ -558,9 +574,22 @@ By now, you should grok this :-)
 
 ---
 class: center, middle
-That's all! Questions?
+# That's all! Questions?
 
-`@cdegroot`
+@cdegroot<br/>
+  ![github](../shared/svg/github.svg)
+  ![linkedin](../shared/svg/linkedin.svg)
+  ![slack](../shared/svg/slack.svg)
+  ![twitter](../shared/svg/twitter.svg)
+
+<hr/>
+
+Must-reads:
+
+Learn You Some Erlang<br/>.fn[http://learnyousomeerlang.com/]
+
+Erlang in Anger<br/>.fn[https://www.erlang-in-anger.com/]
+
     </textarea>
     <script src="../shared/js/remark-latest.min.js">
     </script>
