@@ -3,18 +3,25 @@
   <head>
     <title>Title</title>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="../shared/fonts/webfonts.css" type="text/css" charset="utf-8" />
     <!-- TODO move this stuff to an external CSS file at some point -->
     <style>
       body {
-        font-family: 'Gill Sans';
+        font-family: 'colfaxwebregular';
         line-height: 1.5;
       }
+      h1 {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
       h1, h2, h3 {
-        font-family: 'Gill Sans';
+        font-family: 'colfax-light';
         font-weight: normal;
       }
       .remark-slide-content {
         font-size: 24pt;
+        padding: 1em;
+        padding-top: 0.5em;
       }
       .remark-code, .remark-inline-code {
         font-family: 'Source Code Pro';
@@ -22,6 +29,9 @@
       }
       code {
         border-radius: 5px;
+      }
+      em {
+        font-family: 'colfaxwebregularitalic';
       }
       .remark-code-line {
         font-size: 65%;
@@ -140,9 +150,9 @@ Luckily, GenServer doesn't have a selective receive loop
 ---
 # Everyday OTP.fn[1]
 
-* GenServer
-* Supervisor
-* Application
+* GenServer (gen_server)
+* Supervisor (supervisor)
+* Application (application)
 
 *OTP defines standard behavior*
 
@@ -309,7 +319,7 @@ you're doing.fn[1]
 # Application
 ```elixir
 def start(type, args) do
-  ... what do I do here?
+  #... what do I do here?
 end
 ```
 `args` is almost always the `[]` from `mix.exs`:
