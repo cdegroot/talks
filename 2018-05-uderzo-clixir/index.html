@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Uderzo and Clixir</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../shared/fonts/webfonts.css" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" href="../shared/slide.css" type="text/css" charset="utf-8" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Uderzo and Clixir
+
+## An Elixir-native UI
+
+---
+# Problem: a thermostat
+
+* Nerves, RPi3
+* Sensors, relays
+* A touchscreen
+---
+# A touchscreen?
+
+* Run Xorg, wxWindows, to display temp and an up/down set button?
+* It's a DIY project, soo..
+  * Not Invented Here Syndrome is OK!
+---
+# Requirements
+
+* Fluid between Elixir and C code
+* More Elixir, less C
+* Safe: separate process.
+* It's 2018, bitmaps/bitblit are out, framebuffers/OpenGL are in.
+---
+# Solution
+
+* Native executable
+* stdin/stdout exchange commands
+* GenServer monitors the executable.
+
+class: center, middle
+# That's all! Questions?
+
+@cdegroot<br/>
+  ![github](../shared/svg/github.svg)
+  ![linkedin](../shared/svg/linkedin.svg)
+  ![slack](../shared/svg/slack.svg)
+  ![twitter](../shared/svg/twitter.svg)
+    </textarea>
+    <script src="../shared/js/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+  <!--
+       Local Variables:
+       mode: markdown
+       End:
+     -->
+</html>
