@@ -28,12 +28,14 @@ class: center, middle
 * It's a DIY project, soo..
   * Not Invented Here Syndrome is OK!
 ---
+
 # Requirements
 
 * Fluid between Elixir and C code
 * More Elixir, less C
-* Safe: separate process.
+* Safe: separate process. Pipes freezing over because your thermostat crashed: not funny.
 * It's 2018, bitmaps/bitblit are out, framebuffers/OpenGL are in.
+
 ---
 # Solution
 
@@ -41,10 +43,75 @@ class: center, middle
 * stdin/stdout exchange commands
 * GenServer monitors the executable.
 
+---
+# Talking to C code
+
+1. *Send message to genserver*
+2. Serialize as binary
+3. Send to port
+4. In C: parse and dispatch to correct function
+5. In C: deserialize the arguments
+6. *In C: Execute the work*
+7. In C: serialize return values
+8. Deserialize binary response
+9. Send response
+
+Nine steps, only two are "interesting"
+
+---
+# Clixir: automate the uninteresting steps
+
+```elixir
+use Clixir
+def_c hello(msg, pid) do
+  cdecl "char *": msg
+  fprintf(stderr, "Hello, %s!\n", msg)
+  {pid, :greet_done}
+end
+```
+
+Generates:
+1. The Elixir "call genserver" method
+2. Equivalent C code to the body
+3. A superfast (gperf) dispatch table
+
+---
+# Clixir: makes C binding fun
+
+... So now we can actually write some OpenGL code ...
+
+* GLFW on Xorg platform
+* Broadcom VideoCore on RPi3
+
+---
+# Uderzo: NanoVG and stuff
+
+* NanoVG: smells like HTML5 Canvas
+* Easy, small, "enough"
+* Add some setup code using Clixir
+* The graphics run in a seperate "server" process
+
+---
+# Uderzo: show source
+
+* Display code: [Click Here](https://github.com/cdegroot/uderzo_poncho/blob/master/uderzo_example/lib/thermostat.ex)
+* Calling code: [Click Here](https://github.com/cdegroot/uderzo_poncho/blob/master/uderzo_example/lib/demo.ex)
+
+Demo!
+
+```sh
+cd uderzo_example
+mix run -e Uderzo.Demo.run
+```
+
+---
+
 class: center, middle
 # That's all! Questions?
 
-@cdegroot<br/>
+https://github.com/cdegroot/uderzo_poncho
+
+`cdegroot` on:<br/>
   ![github](../shared/svg/github.svg)
   ![linkedin](../shared/svg/linkedin.svg)
   ![slack](../shared/svg/slack.svg)
