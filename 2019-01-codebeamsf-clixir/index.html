@@ -273,8 +273,92 @@ static void _dispatch_Elixir_Example_hello(const char *buf, unsigned short len,
     // recognize this bit??
     fprintf(stderr, "Hello, %s!\n", message);
 }
+```
+
+---
+# Returning values
 
 ```
+def_c abs(value, pid) do
+  cdecl long: [value, result]
+  cdecl erlang_pid: pid
+
+  if value < 0 do
+    result = value * -1
+  else
+    result = value
+  end
+  {pid, {:ok, result}}
+end
+```
+
+???
+Some ugliness is shining through here.
+
+---
+# Returning values
+
+```c
+static void _dispatch_Elixir_Example_abs(const char *buf,
+                                         unsigned short len, int *index) {
+    erlang_pid pid; long result; long value;
+    assert(ei_decode_long(buf, index, &value) == 0);
+    assert(ei_decode_pid(buf, index, &pid) == 0);
+    if (value < 0) {
+        result = value * -(1);
+    } else {
+        result = value;    }
+    char response[BUF_SIZE];
+    int response_index = 0;
+    ei_encode_version(response, &response_index);
+    ei_encode_tuple_header(response, &response_index, 2);
+    ei_encode_pid(response, &response_index, &pid);
+    ei_encode_tuple_header(response, &response_index, 2);
+    ei_encode_atom(response, &response_index, "ok");
+    ei_encode_long(response, &response_index, result);
+    write_response_bytes(response, response_index);
+}
+```
+
+---
+# Returning values
+
+```
+def handle_info({_port, {:data, data}}, state) do
+  stuff = :erlang.binary_to_term(data)
+  Logger.debug("Received response #{inspect stuff}")
+  dispatch_message(stuff)
+  {:noreply, state}
+end
+
+defp dispatch_message({pid, response}) when is_pid(pid) do
+  send(pid, response)
+end
+...
+```
+Sync = async request + async response, very Erlang!
+
+---
+# Recap
+
+(above diagrams, with checkmarks)
+
+---
+# Current status
+
+---
+# Uderzo
+
+---
+# So what about...
+
+(picture of hardware)
+
+---
+<video class="full-image" autoplay="true"> <!--width="320" height="240" controls-->
+<source src="nerves-demo.mp4" type="video/mp4">
+</video>
+
     </textarea>
     <script src="../shared/js/remark-latest.min.js">
     </script>
