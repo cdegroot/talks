@@ -39,7 +39,7 @@ em {
   vertical-align: super;
 }
 .footnote {
-  font-size: 75%;
+  font-size: 50%;
 }
 .normalimg img {
   width: 100%;
@@ -61,4 +61,10 @@ em {
 .remark-slide-scaler {
   box-shadow: 0 0 30px #000;
   -webkit-box-shadow: 0 0 30px #000;
+}
+.full-image {
+  width: 90%;
+  vertical-align: top;
+  display: block;
+  margin: 0 auto;
 }
