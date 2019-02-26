@@ -349,13 +349,57 @@ Sync = async request + async response, very Erlang!
 ---
 # Recap
 
-(above diagrams, with checkmarks)
+<img class="full-image" src="clixir-solution-is-ok.svg" />
 
 ---
-# Current status
+# Uderzo: GenRenderer
+
+```
+defmodule Demo do
+  @fps 100
+  use Uderzo.GenRenderer
+  def run do
+    {:ok, boids} = Boids.start_link()
+    Uderzo.GenRenderer.start_link(__MODULE__, "Uderzo Boids", 800, 600, @fps, boids)
+    Process.sleep(:infinity)
+  end
+  def init_renderer(boids) do
+    {:ok, boids}
+  end
+  def render_frame(win_width, win_height, _mx, _my, boids) do
+    BoidsUi.paint_background(win_width, win_height)
+    Enum.each(Boids.get_all(boids), fn {x, y, v} ->
+      BoidsUi.render(win_width, win_height, x, y, v)
+    end)
+    {:ok, boids}
+  end
+end
+```
 
 ---
-# Uderzo
+# Uderzo: Clixir rendering code
+
+```
+def_c paint_background(win_width, win_height) do
+  cdecl double: [win_width, win_height]
+  cdecl "NVGpaint": air
+  cdecl "NVGpaint": sun
+
+  air = nvgLinearGradient(vg, win_width / 2, 0, win_width / 2, win_height, nvgRGBA(0, 64, 196, 255), nvgRGBA(0, 196, 255, 255))
+  nvgBeginPath(vg)
+  nvgRect(vg, 0, 0, win_width, win_height)
+  nvgFillPaint(vg, air)
+  nvgFill(vg)
+
+  sun = nvgRadialGradient(vg, win_width * 0.8, win_height * 0.2, 0.04 * win_width, 0.05 * win_width, nvgRGBA(255, 255, 0, 255), nvgRGBA(128, 128
+, 0, 0))
+
+  nvgBeginPath(vg)
+  nvgCircle(vg, win_width * 0.8, win_height * 0.2, 0.1 * win_width)
+  nvgFillPaint(vg, sun)
+  nvgFill(vg)
+end
+```
 
 ---
 # Demo time!
