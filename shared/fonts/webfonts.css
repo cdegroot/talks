@@ -5,6 +5,8 @@
  *
  * With one of the snippets as the template.
  */
+@import url("source-code-pro/source-code-pro.css");
+
 @font-face {
     font-family: 'colfax-light';
     src: url('colfax-light.eot'); /* IE 9 Compatibility Mode */
@@ -77,4 +79,3 @@
          url('webfonts.ttf') format('truetype'), /* Safari, Android, iOS */
          url('webfonts.svg#webfonts') format('svg'); /* Chrome < 4, Legacy iOS */
 }
-
