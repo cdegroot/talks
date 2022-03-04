@@ -28,26 +28,26 @@ services."_ &mdash; from our first V2MOM
 
 * We monitor over 60 services from AWS, Azure, GCP, and independent vendors like Heroku, Github, CircleCI,
 PagerDuty, etc.
-* Cloud platforms are monitored locally from all North-American instances.
+* Cloud platforms are monitored locally from all North-American regions (20 in total).
 
 
 ... demo. Hopefully ...
 ---
-Platform development
+# Platform development
 
 * Initial proof-of-concept pure AWS serverless play, C#, lots of lambdas
 * Messy, slow.
 * Very cheap though :)
 * Decided to move to Elixir in April 2021, use "CELP" stack.
 ---
-What is CELP?
+# What is CELP?
 
 * <b>C</b>ommanded
 * <b>E</b>lixir
 * <b>L</b>iveView
 * <b>P</b>ostgreSQL
 ---
-Elixir and PostgreSQL
+# Elixir and PostgreSQL
 
 * Fast
 * Works
@@ -55,52 +55,52 @@ Elixir and PostgreSQL
 
 Did I miss anything? ;-)
 ---
-Phoenix LiveView
+# Phoenix LiveView
 
 * Every dev is now full-stack
 * Works well with the JS libs we need
 * Liveliness by default is awesome
 * We're a B2B SaaS so not too worried about too many users
 ---
-Commanded
+# Commanded
 
 * CQRS/ES library in Elixir
 * Natively uses PostgreSQL for event store
 * CQRS/ES works extremely well with LiveView
 ---
-CQRS/ES explained in a handful of slides
+# CQRS/ES explained in a handful of slides
 
 * Command and Query Responsibility Segregation with Event Sourcing
 * Firmly rooted in Domain Driven Design terminology (Evans 2003)
 * Quite popular in the Microsoft/.NET world
 ---
-CQRS/ES explained in a handful of slides
+# CQRS/ES explained in a handful of slides
 
 * Like accounting, you never update: you add entries to a ledger (events)
 * You roll up these entries into useful data (projections)
 * It's all a flow of unidirectional messages, async.
 ---
-Commanded and LiveView
+# Commanded and LiveView
 
-* User edits
-* LiveView handler creates a Command and sends it off
-* Commanded dehydrates aggregate root and forwards Command
-* Aggregate root (optionally) emits Event
-* Commanded stores Event
-* ... projections happen
-* ... event handler sends to PubSub
-* LiveView receives update from PubSub and reassigns
-* Shown on all connected browsers.
-
-(needs diagram)
----
-
+<div class="mermaid">
+  flowchart LR
+  U((User)) -- 1.Edit --> L[LiveView]
+  L -- 2.Command --> C[Commanded]
+  C -- 3.Command --> A[Aggregate Root]
+  A -- 4.Event --> C
+  C -- 5.Event --> D[(Database)]
+  C -- 6.Event --> P[Projector]
+  P -- 7.Event --> S[PubSub]
+  S -- 8.Event --> L
+  L -- 9.WS Update --> U
+</div>
 
     </textarea>
-    <script src="../shared/js/remark-latest.min.js">
-    </script>
+    <script src="../shared/js/remark-latest.min.js"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
       var slideshow = remark.create();
+      mermaid.initialize({startOnLoad: true})
     </script>
   </body>
   <!--
