@@ -7,3 +7,4 @@ me switching to a text-based format for decks and Git goodness.
 
 * [Elixir under the Hood](2017-03-elixir-under-the-hood), Toronto Elixir meetup March 2017
 * [Clixir and Uderzo](2018-05-uderzo-clixir), Toronto Elixir meetup May 2018
+* [CELP stack at Metrist](2022-04-04-celp-at-metrist), Toronto Elixir meetup ...

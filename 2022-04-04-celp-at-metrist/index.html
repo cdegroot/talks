@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CELP at Metrist</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../shared/fonts/webfonts.css" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" href="../shared/slide.css" type="text/css" charset="utf-8" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# CELP stack at Metrist.io
+
+## Cees de Groot &lt;cees@metrist.io&gt;
+---
+# About us
+
+_"The first place developers go in order to discover, avoid, debug, monitor, and remediate issues with their third-party
+services."_ &mdash; from our first V2MOM
+
+* Founded 2020 by two former PagerDuty employees
+* Seed funding in 2021
+* Currently 8 people
+---
+# About us
+
+* We monitor over 60 services from AWS, Azure, GCP, and independent vendors like Heroku, Github, CircleCI,
+PagerDuty, etc.
+* Cloud platforms are monitored locally from all North-American instances.
+
+
+... demo. Hopefully ...
+---
+Platform development
+
+* Initial proof-of-concept pure AWS serverless play, C#, lots of lambdas
+* Messy, slow.
+* Very cheap though :)
+* Decided to move to Elixir in April 2021, use "CELP" stack.
+---
+What is CELP?
+
+* <b>C</b>ommanded
+* <b>E</b>lixir
+* <b>L</b>iveView
+* <b>P</b>ostgreSQL
+---
+Elixir and PostgreSQL
+
+* Fast
+* Works
+* Flexible
+
+Did I miss anything? ;-)
+---
+Phoenix LiveView
+
+* Every dev is now full-stack
+* Works well with the JS libs we need
+* Liveliness by default is awesome
+* We're a B2B SaaS so not too worried about too many users
+---
+Commanded
+
+* CQRS/ES library in Elixir
+* Natively uses PostgreSQL for event store
+* CQRS/ES works extremely well with LiveView
+---
+CQRS/ES explained in a handful of slides
+
+* Command and Query Responsibility Segregation with Event Sourcing
+* Firmly rooted in Domain Driven Design terminology (Evans 2003)
+* Quite popular in the Microsoft/.NET world
+---
+CQRS/ES explained in a handful of slides
+
+* Like accounting, you never update: you add entries to a ledger (events)
+* You roll up these entries into useful data (projections)
+* It's all a flow of unidirectional messages, async.
+---
+Commanded and LiveView
+
+* User edits
+* LiveView handler creates a Command and sends it off
+* Commanded dehydrates aggregate root and forwards Command
+* Aggregate root (optionally) emits Event
+* Commanded stores Event
+* ... projections happen
+* ... event handler sends to PubSub
+* LiveView receives update from PubSub and reassigns
+* Shown on all connected browsers.
+
+(needs diagram)
+---
+
+
+    </textarea>
+    <script src="../shared/js/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+  <!--
+       Local Variables:
+       mode: markdown
+       End:
+     -->
+</html>
+</html>

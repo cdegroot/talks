@@ -59,7 +59,7 @@ em {
   width: 210px;
   background-repeat: no-repeat;
   background-size: contain;
-  background-image: url('../shared/PagerDuty-logo-green.png')
+  background-image: url('../shared/metrist-logo.svg')
 }
 .remark-visible {
   background: #333;
