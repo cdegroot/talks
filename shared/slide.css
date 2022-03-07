@@ -32,11 +32,20 @@ h1, h2, h3 {
   font-size: 12pt;
   bottom: 21px;
 }
-.remark-code, .remark-inline-code {
+.remark-code {
   font-family: 'Source Code Pro';
   font-weight: 400;
   font-size: 80%;
   background-color: #f0f0f0;
+}
+.remark-inline-code {
+  font-family: 'Source Code Pro';
+  font-weight: 400;
+  letter-spacing: -.075em;
+  color: #bc6000;
+  background-color: #f0f0f0;
+  margin-left: 0.25em;
+  margin-right: 0.25em;
 }
 code {
   border-radius: 5px;

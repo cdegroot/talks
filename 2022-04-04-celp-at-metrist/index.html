@@ -74,24 +74,25 @@ Did I miss anything? ;-)
 
 * CQRS/ES library in Elixir
 * Natively uses PostgreSQL for event store
-* CQRS/ES works extremely well with LiveView
+* CQRS/ES works _extremely_ well with LiveView
 
 ---
-# CQRS/ES explained in a handful of slides
+# CQRS/ES
 
 * Command and Query Responsibility Segregation with Event Sourcing
 * Firmly rooted in Domain Driven Design terminology (Evans 2003)
 * Quite popular in the Microsoft/.NET world
 
 ---
-# CQRS/ES explained in a handful of slides
+# CQRS/ES
 
 * Like accounting, you never update: you add entries to a ledger (events)
 * You roll up these entries into useful data (projections)
-* It's all a flow of unidirectional messages, async.
+* It's all a flow of unidirectional messages, asynchronously.
 
 ---
-# Commanded and LiveView
+# CQRS/ES
+with Commanded and LiveView
 
 <div class="mermaid">
   flowchart LR
@@ -216,7 +217,7 @@ Commanded supports clustering, we're on AWS, so quite simply:
 * Managed by Terraform
 * Rolling upgrades by simple Elixir script
 * All containers for easy distribution
-  * but `"--network host"`!
+  * but `--network host` to keep it simple
 
 ---
 
@@ -224,6 +225,8 @@ class: center, middle
 # That's all! Questions?
 
 https://metrist.io/
+
+[cees@metrist.io](mailto:cees@metrist.io)
 
 `cdegroot @` <br/>
   ![github](../shared/svg/github.svg)
