@@ -1,5 +1,10 @@
+
+@import url("fonts/source-code-pro/source-code-pro.css");
+@import url("fonts/nunito.css");
+
 body {
-  font-family: 'colfaxwebregular';
+  font-family: 'Nunito';
+  font-weight: 300;
   line-height: 1.5;
   color:         #333;
 }
@@ -14,8 +19,9 @@ h1 {
   font-family: 'Source Code Pro';
 }
 h1, h2, h3 {
-  font-family: 'colfax-light';
-  font-weight: normal;
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 700;
 }
 .remark-slide-content {
   font-size: 24pt;
@@ -28,6 +34,7 @@ h1, h2, h3 {
 }
 .remark-code, .remark-inline-code {
   font-family: 'Source Code Pro';
+  font-weight: 400;
   font-size: 80%;
   background-color: #f0f0f0;
 }
@@ -35,7 +42,8 @@ code {
   border-radius: 5px;
 }
 em {
-  font-family: 'colfaxwebregularitalic';
+  font-family: 'Nunito';
+  font-style: italic;
 }
 .remark-code-line {
   font-size: 65%;

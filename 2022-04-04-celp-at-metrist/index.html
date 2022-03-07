@@ -4,7 +4,6 @@
   <head>
     <title>CELP at Metrist</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="../shared/fonts/webfonts.css" type="text/css" charset="utf-8" />
     <link rel="stylesheet" href="../shared/slide.css" type="text/css" charset="utf-8" />
   </head>
   <body>
@@ -12,7 +11,7 @@
 
 class: center, middle
 
-# CELP stack at Metrist.io
+# CELP stack at Metrist
 
 ## Cees de Groot &lt;cees@metrist.io&gt;
 ---
@@ -23,7 +22,8 @@ services."_ &mdash; from our first V2MOM
 
 * Founded 2020 by two former PagerDuty employees
 * Seed funding in 2021
-* Currently 8 people
+* Currently nine people in four countries, six timezones
+
 ---
 # About us
 
@@ -104,13 +104,14 @@ Did I miss anything? ;-)
   P -- 7.Event --> S[Phoenix PubSub]
   S -- 8.Event --> L
   L -- 9.WS Update --> U
+</div>
 
 ---
 # In Code
 
 Shopping cart example. Command:
 
-```
+```elixir
 typedstruct module: AddItemToCart do
   field :id, String.t()
   field :product_id, String.t()
@@ -179,7 +180,8 @@ Project event back to UI using Phoenix PubSub:
 ```elixir
 @impl Commanded.Projections.Ecto
 def after_update(event, metadata, _changeset) do
-  # Application-specific, we assume a helper method to get the topic out of an event
+  # Application-specific, we assume a helper method to get the
+  # topic out of an event
   MyApp.PubSub.broadcast_to_topic_of!(
     event,
     %{event: event, metadata: metadata}
@@ -193,7 +195,8 @@ end
 Update LiveView state:
 
 ```elixir
-def handle_info({:event_published, %ItemAdded{id: cart_id, product_id: product_id}}, socket) do
+def handle_info({:event_published,
+                %ItemAdded{id: cart_id, product_id: product_id}}, socket) do
   socket = if cart_id == socket.assigns.cart_id do
     assign(socket, items, [product_id | socket.assigns.items])
   else
@@ -213,7 +216,7 @@ Commanded supports clustering, we're on AWS, so quite simply:
 * Managed by Terraform
 * Rolling upgrades by simple Elixir script
 * All containers for easy distribution
-  * but `--network host`!
+  * but `"--network host"`!
 
 ---
 
