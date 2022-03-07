@@ -1,3 +1,4 @@
+<!-- -*- mode: markdown; -*- -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -32,13 +33,15 @@ PagerDuty, etc.
 
 
 ... demo. Hopefully ...
+
 ---
 # Platform development
 
-* Initial proof-of-concept pure AWS serverless play, C#, lots of lambdas
+* Initial proof-of-concept: pure AWS serverless play, C#, lots of lambdas
 * Messy, slow.
 * Very cheap though :)
 * Decided to move to Elixir in April 2021, use "CELP" stack.
+
 ---
 # What is CELP?
 
@@ -46,6 +49,7 @@ PagerDuty, etc.
 * <b>E</b>lixir
 * <b>L</b>iveView
 * <b>P</b>ostgreSQL
+
 ---
 # Elixir and PostgreSQL
 
@@ -54,31 +58,38 @@ PagerDuty, etc.
 * Flexible
 
 Did I miss anything? ;-)
+
 ---
 # Phoenix LiveView
 
 * Every dev is now full-stack
-* Works well with the JS libs we need
+  * especially with Tailwind
+* Works well with the JS libs we need (Graphing/Charting, Apex for now)
 * Liveliness by default is awesome
-* We're a B2B SaaS so not too worried about too many users
+* We're a B2B SaaS so not too worried about too many users eating all memory
+  with LiveView session data
+
 ---
 # Commanded
 
 * CQRS/ES library in Elixir
 * Natively uses PostgreSQL for event store
 * CQRS/ES works extremely well with LiveView
+
 ---
 # CQRS/ES explained in a handful of slides
 
 * Command and Query Responsibility Segregation with Event Sourcing
 * Firmly rooted in Domain Driven Design terminology (Evans 2003)
 * Quite popular in the Microsoft/.NET world
+
 ---
 # CQRS/ES explained in a handful of slides
 
 * Like accounting, you never update: you add entries to a ledger (events)
 * You roll up these entries into useful data (projections)
 * It's all a flow of unidirectional messages, async.
+
 ---
 # Commanded and LiveView
 
@@ -90,11 +101,132 @@ Did I miss anything? ;-)
   A -- 4.Event --> C
   C -- 5.Event --> D[(Database)]
   C -- 6.Event --> P[Projector]
-  P -- 7.Event --> S[PubSub]
+  P -- 7.Event --> S[Phoenix PubSub]
   S -- 8.Event --> L
   L -- 9.WS Update --> U
-</div>
 
+---
+# In Code
+
+Shopping cart example. Command:
+
+```
+typedstruct module: AddItemToCart do
+  field :id, String.t()
+  field :product_id, String.t()
+end
+```
+
+---
+# In Code
+
+Phoenix LiveView event handler:
+
+```elixir
+def handle_event("add-item", %{product_id: product_id}, socket) do
+  App.dispatch(%AddItemToCart(id: socket.assigns.cart_id, product_id: product_id))
+  {:noreply, socket}
+end
+```
+
+---
+# In Code
+
+Aggregate root command handler:
+
+```elixir
+def execute(cart, c = %AddItemToCart{}) do
+  if has_item(cart, c.product_id) do
+    raise "You cannot add the same item more than once"
+  else
+    %ItemAdded{id: cart.id, product_id: c.product_id}
+  end
+end
+```
+
+---
+# In Code
+
+Aggregate root event handler:
+
+```elixir
+def apply(cart, %ItemAdded{product_id: product_id}) do
+  %{cart | items: [product_id | cart.items]}
+end
+```
+---
+
+# In Code
+
+Project event to RDBMS using Ecto:
+
+```elixir
+project(e = %ItemAdded{}, _metadata, fn multi ->
+  Ecto.Multi.insert(multi, :project, %Projections.CartItem{
+    id: e.id,
+    product_id: e.product_id,
+  })
+end)
+```
+
+(`project` is a macro from the Commanded Ecto support library)
+
+---
+# In Code
+
+Project event back to UI using Phoenix PubSub:
+
+```elixir
+@impl Commanded.Projections.Ecto
+def after_update(event, metadata, _changeset) do
+  # Application-specific, we assume a helper method to get the topic out of an event
+  MyApp.PubSub.broadcast_to_topic_of!(
+    event,
+    %{event: event, metadata: metadata}
+  )
+end
+```
+
+---
+# In Code
+
+Update LiveView state:
+
+```elixir
+def handle_info({:event_published, %ItemAdded{id: cart_id, product_id: product_id}}, socket) do
+  socket = if cart_id == socket.assigns.cart_id do
+    assign(socket, items, [product_id | socket.assigns.items])
+  else
+    socket
+  end
+  {:noreply, socket}
+end
+```
+
+---
+# Deployment
+
+Commanded supports clustering, we're on AWS, so quite simply:
+
+* Route53 -> AWS Application Load Balancer (ALB)
+* ALB -> two EC2 instances clustered using `libcluster`
+* Managed by Terraform
+* Rolling upgrades by simple Elixir script
+* All containers for easy distribution
+  * but `--network host`!
+
+---
+
+class: center, middle
+# That's all! Questions?
+
+https://metrist.io/
+
+`cdegroot @` <br/>
+  ![github](../shared/svg/github.svg)
+  ![linkedin](../shared/svg/linkedin.svg)
+  ![slack](../shared/svg/slack.svg)
+  ![twitter](../shared/svg/twitter.svg)
     </textarea>
     <script src="../shared/js/remark-latest.min.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
